@@ -1,0 +1,20 @@
+https://intranet.grid5000.fr/oar/Nancy/monika.cgi?job=4026638
+
+gros-87 - server - 172.16.66.87
+gros-90 - agent - 172.16.66.90
+gros-91 - agent
+gros-99 - client
+
+job start: 09:46:31
+
+# goal
+traffic start: 11:00 04/03/2023
+exploit: 16:00 05/03/2023
+traffic end: 17:00 05/03/2023
+
+# screens
+4352 - traffic
+
+job end: 21:46:31
+
+&from=1677924000000&to=1678032000000
